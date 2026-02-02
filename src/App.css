@@ -108,6 +108,72 @@
   background: #5568d3;
 }
 
+/* Sort Controls */
+.todo-sort-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.todo-sort-button {
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.todo-sort-button:hover {
+  background: #e9ecef;
+  border-color: #d0d0d0;
+}
+
+.todo-sort-button.active {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.todo-sort-button.active:hover {
+  background: #218838;
+}
+
+/* Priority Indicator */
+.todo-priority-indicator {
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Priority Select Control */
+.priority-select-label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.priority-select {
+  appearance: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  background: #000000;
+  cursor: pointer;
+}
+
+.priority-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.08);
+  border-color: #667eea;
+}
+
 /* Empty State */
 .todo-empty-state {
   text-align: center;
@@ -379,4 +445,17 @@
     padding: 0.35rem 0.6rem;
     font-size: 0.75rem;
   }
+}
+
+/* Accessibility helpers */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }

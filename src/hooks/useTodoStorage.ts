@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Todo } from '../types/todo';
+import { Priority } from '../types/todo';
 
 const STORAGE_KEY = 'todos-app-data';
 
@@ -15,7 +16,12 @@ export function useTodoStorage() {
           const parsed = JSON.parse(stored) as Todo[];
           // Validate structure
           if (Array.isArray(parsed) && parsed.every(isValidTodo)) {
-            setTodos(parsed);
+            // Migrate existing todos to have MEDIUM priority if they don't have one
+            const migratedTodos = parsed.map(todo => ({
+              ...todo,
+              priority: todo.priority || Priority.MEDIUM
+            }));
+            setTodos(migratedTodos);
           } else {
             console.warn('Invalid todo data in storage, starting fresh');
             localStorage.removeItem(STORAGE_KEY);
@@ -42,7 +48,7 @@ export function useTodoStorage() {
     }
   }, [todos]);
 
-  const addTodo = (title: string): void => {
+  const addTodo = (title: string, priority: Priority = Priority.MEDIUM): void => {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) return;
 
@@ -51,6 +57,7 @@ export function useTodoStorage() {
       title: trimmedTitle,
       completed: false,
       createdAt: Date.now(),
+      priority,
     };
 
     setTodos((prev) => [...prev, newTodo]);
@@ -76,6 +83,10 @@ export function useTodoStorage() {
     setTodos((prev) => prev.filter((todo) => !todo.completed));
   };
 
+  const updateTodo = (id: string, patch: Partial<Todo>): void => {
+    setTodos((prev) => prev.map((todo) => (todo.id === id ? { ...todo, ...patch } : todo)));
+  };
+
   return {
     todos,
     addTodo,
@@ -83,6 +94,7 @@ export function useTodoStorage() {
     deleteTodo,
     clearTodos,
     clearCompletedTodos,
+    updateTodo,
   };
 }
 

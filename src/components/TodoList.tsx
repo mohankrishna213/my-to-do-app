@@ -3,14 +3,20 @@ import { TodoInput } from './TodoInput';
 import { TodoItem } from './TodoItem';
 import { TodoFilter, type FilterType } from './TodoFilter';
 import { useTodoStorage } from '../hooks/useTodoStorage';
+import { Priority } from '../types/todo';
 
 export function TodoList() {
-  const { todos, addTodo, toggleTodo, deleteTodo, clearCompletedTodos } = useTodoStorage();
+  const { todos, addTodo, toggleTodo, deleteTodo, clearCompletedTodos, updateTodo } = useTodoStorage();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [sortByPriority, setSortByPriority] = useState(false);
 
   const handleClearCompleted = () => {
     setShowConfirmDialog(true);
+  };
+
+  const handleUpdatePriority = (id: string, priority: Priority) => {
+    updateTodo(id, { priority });
   };
 
   const confirmClearCompleted = () => {
@@ -38,6 +44,16 @@ export function TodoList() {
   const completedCount = todos.filter((t) => t.completed).length;
   const activeCount = todos.length - completedCount;
 
+  // Sort todos by priority if enabled
+  const sortedTodos = sortByPriority
+    ? [...filteredTodos].sort((a, b) => {
+        const priorityOrder = { [Priority.HIGH]: 3, [Priority.MEDIUM]: 2, [Priority.LOW]: 1 };
+        const aPriority = priorityOrder[a.priority || Priority.MEDIUM];
+        const bPriority = priorityOrder[b.priority || Priority.MEDIUM];
+        return bPriority - aPriority; // High to low priority
+      })
+    : filteredTodos;
+
   return (
     <div className="todo-list-container">
       <h1 className="todo-title-heading">My Todo App</h1>
@@ -46,7 +62,16 @@ export function TodoList() {
 
       <TodoFilter currentFilter={filter} onFilterChange={setFilter} />
 
-      {filteredTodos.length === 0 ? (
+      <div className="todo-sort-controls">
+        <button
+          onClick={() => setSortByPriority(!sortByPriority)}
+          className={`todo-sort-button ${sortByPriority ? 'active' : ''}`}
+        >
+          {sortByPriority ? 'Sort by Date' : 'Sort by Priority'}
+        </button>
+      </div>
+
+      {sortedTodos.length === 0 ? (
         <p className="todo-empty-state">
           {todos.length === 0 
             ? "No todos yet. Add one to get started."
@@ -59,12 +84,13 @@ export function TodoList() {
         </p>
       ) : (
         <div className="todo-items-list">
-          {filteredTodos.map((todo) => (
+          {sortedTodos.map((todo) => (
             <TodoItem
               key={todo.id}
               todo={todo}
               onToggle={toggleTodo}
               onDelete={deleteTodo}
+              onUpdatePriority={handleUpdatePriority}
             />
           ))}
         </div>
